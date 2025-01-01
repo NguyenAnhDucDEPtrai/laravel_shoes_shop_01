@@ -38,17 +38,16 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="products.html" class="nav-link">
+                    <a href="{{ route('admin.users.index') }}" class="nav-link">
                         <i class="nav-icon fas fa-tag"></i>
-                        <p>Products</p>
+                        <p>Người dùng</p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <!-- <i class="nav-icon fas fa-tag"></i> -->
+                    <a href="{{ route('admin.shoes.index') }}" class="nav-link">
                         <i class="fas fa-truck nav-icon"></i>
-                        <p>Shipping</p>
+                        <p>Giày</p>
                     </a>
                 </li>
                 <li class="nav-item">

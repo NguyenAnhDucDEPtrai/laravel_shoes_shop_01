@@ -31,15 +31,21 @@
         <div class="card">
             <div class="card-header">
                 <div class="card-tools">
-                    <div class="input-group input-group" style="width: 250px;">
-                        <input type="text" name="table_search" class="form-control float-right" placeholder="Tìm kiếm">
-
-                        <div class="input-group-append">
-                            <button type="submit" class="btn btn-default">
-                                <i class="fas fa-search"></i>
-                            </button>
+                    <form action="{{ route('admin.categories.index') }}" method="GET">
+                        <div class="input-group" style="width: 250px;">
+                            <input
+                                type="text"
+                                name="search"
+                                class="form-control float-right"
+                                placeholder="Tìm kiếm"
+                                value="{{ request('search') }}">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-default">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
 
@@ -56,6 +62,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @if($categories->count() > 0)
                         @foreach($categories as $category)
                         <tr>
                             <td>{{ $category->id }}</td>
@@ -74,11 +81,16 @@
                             </td>
                         </tr>
                         @endforeach
+                        @else
+                        <tr>
+                            <td colspan="4" class="text-center">Không tìm thấy danh mục nào phù hợp.</td>
+                        </tr>
+                        @endif
                     </tbody>
                 </table>
             </div>
             <div class="card-footer clearfix">
-                {{ $categories->links() }}
+                {{ $categories->appends(['search' => request('search')])->links() }}
             </div>
         </div>
     </div>

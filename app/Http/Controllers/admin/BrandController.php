@@ -8,9 +8,13 @@ use App\Models\Brand;
 
 class BrandController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $brands = Brand::orderBy('id', 'desc')->paginate(10);
+        $query = Brand::query();
+        if ($request->has('search') && $request->search != '') {
+            $query->where('brand_name', 'LIKE', '%' . $request->search . '%');
+        }
+        $brands = $query->orderBy('id', 'desc')->paginate(10);
         return view('admin.brands.index', compact('brands'));
     }
 

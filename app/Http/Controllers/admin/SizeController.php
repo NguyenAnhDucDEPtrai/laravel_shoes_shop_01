@@ -8,9 +8,13 @@ use App\Models\Size;
 
 class SizeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $sizes = Size::orderBy('id', 'desc')->paginate(10);
+        $query = Size::query();
+        if ($request->has('search') && $request->search != '') {
+            $query->where('size', 'LIKE', '%' . $request->search . '%');
+        }
+        $sizes = $query->orderBy('id', 'desc')->paginate(10);
         return view('admin.sizes.index', compact('sizes'));
     }
 
@@ -45,7 +49,7 @@ class SizeController extends Controller
     public function update(Request $request, $id)
     {
         $validatedData =  $request->validate([
-            'size' => 'required|numeric||unique:sizes,size,' .$id,
+            'size' => 'required|numeric||unique:sizes,size,' . $id,
             'status' => 'required|in:Active,Block',
         ], [
             'size.required' => 'Kích thước không đc để trống.',

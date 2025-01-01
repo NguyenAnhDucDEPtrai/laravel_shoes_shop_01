@@ -31,16 +31,23 @@
         <div class="card">
             <div class="card-header">
                 <div class="card-tools">
-                    <div class="input-group input-group" style="width: 250px;">
-                        <input type="text" name="table_search" class="form-control float-right" placeholder="Tìm kiếm">
-
-                        <div class="input-group-append">
-                            <button type="submit" class="btn btn-default">
-                                <i class="fas fa-search"></i>
-                            </button>
+                    <form action="{{ route('admin.brands.index') }}" method="GET">
+                        <div class="input-group" style="width: 250px;">
+                            <input
+                                type="text"
+                                name="search"
+                                class="form-control float-right"
+                                placeholder="Tìm kiếm"
+                                value="{{ request('search') }}">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-default">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
+
             </div>
 
             @include('admin.message')
@@ -55,6 +62,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @if($brands->count() > 0)
                         @foreach($brands as $brand)
                         <tr>
                             <td>{{ $brand->id }}</td>
@@ -72,11 +80,17 @@
                             </td>
                         </tr>
                         @endforeach
+                        @else
+                        <tr>
+                            <td colspan="4" class="text-center">Không tìm thấy thương hiệu nào phù hợp.</td>
+                        </tr>
+                        @endif
                     </tbody>
+
                 </table>
             </div>
             <div class="card-footer clearfix">
-                {{ $brands->links() }}
+                {{ $brands->appends(['search' => request('search')])->links() }}
             </div>
         </div>
     </div>

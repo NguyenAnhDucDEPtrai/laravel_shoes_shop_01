@@ -9,9 +9,13 @@ use App\Models\Brand;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::with('brand')->orderBy('id', 'desc')->paginate(10);
+        $query = Category::query();
+        if ($request->has('search') && $request->search != '') {
+            $query->where('category_name', 'LIKE', '%' . $request->search . '%');
+        }
+        $categories = $query->orderBy('id', 'desc')->paginate(10);
         return view('admin.categories.index', compact('categories'));
     }
 

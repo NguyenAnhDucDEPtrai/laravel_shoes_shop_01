@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('sizes', function (Blueprint $table) {
             $table->id();
-            $table->string('size', 10);
+            $table->string('size', 10)->unique();
             $table->enum('status', ['Active', 'Block']);
             $table->timestamps();
         });

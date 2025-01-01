@@ -7,6 +7,8 @@ use App\Http\Controllers\admin\HomeController;
 use App\Http\Controllers\admin\BrandController;
 use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\SizeController;
+use App\Http\Controllers\admin\UserController;
+use App\Http\Controllers\admin\ShoeController;
 
 use App\Http\Middleware\AdminMiddleware;
 
@@ -43,4 +45,27 @@ Route::middleware([AdminMiddleware::class])->group(function () {
     Route::get('/admin/sizes/{id}/edit', [SizeController::class, 'edit'])->name('admin.sizes.edit');
     Route::put('/admin/sizes/{id}', [SizeController::class, 'update'])->name('admin.sizes.update');
     Route::delete('/admin/sizes/{id}', [SizeController::class, 'destroy'])->name('admin.sizes.destroy');
+
+    // admin users
+    Route::get('/admin/users/index', [UserController::class, 'index'])->name('admin.users.index');
+    Route::get('/admin/users/create', [UserController::class, 'create'])->name('admin.users.create');
+    Route::post('/admin/users/store', [UserController::class, 'store'])->name('admin.users.store');
+    Route::get('/admin/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
+    Route::put('/admin/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
+    Route::delete('/admin/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+
+    // admin Shoes
+    Route::get('/admin/shoes/index', [ShoeController::class, 'index'])->name('admin.shoes.index');
+    Route::get('/admin/shoes/create', [ShoeController::class, 'create'])->name('admin.shoes.create');
+    Route::post('/admin/shoes/store', [ShoeController::class, 'store'])->name('admin.shoes.store');
+    Route::get('/admin/shoes/{id}/edit', [ShoeController::class, 'edit'])->name('admin.shoes.edit');
+    Route::put('/admin/shoes/{id}', [ShoeController::class, 'update'])->name('admin.shoes.update');
+    Route::delete('/admin/shoes/{id}', [ShoeController::class, 'destroy'])->name('admin.shoes.destroy');
+
+    // Đặt tên cho route lấy danh mục theo thương hiệu
+    Route::get('/admin/getCategoriesByBrand/{brand_id}', [ShoeController::class, 'getCategoriesByBrand'])->name('admin.categories.byBrand');
+    // routes/web.php
+    Route::post('/admin/upload_temp', [ShoeController::class, 'upload_temp'])->name('admin.shoes.upload_temp');
+    // routes/web.php
+    Route::post('admin/shoes/delete_temp', [ShoeController::class, 'deleteTemp'])->name('admin.shoes.delete_temp');
 });

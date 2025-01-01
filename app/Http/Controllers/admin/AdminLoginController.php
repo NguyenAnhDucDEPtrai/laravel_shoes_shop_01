@@ -69,6 +69,6 @@ class AdminLoginController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect()->route('admin.view_login')->with('success', 'You have been logged out!');
+        return redirect()->route('admin.view_login')->with('success', 'Bạn đăng xuất thành công!');
     }
 }

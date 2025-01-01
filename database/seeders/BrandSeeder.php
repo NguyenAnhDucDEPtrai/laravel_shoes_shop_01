@@ -14,16 +14,13 @@ class BrandSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = Faker::create();
-        $brands = [];
-        foreach (range(1, 20) as $index) {
-            $brands[] = [
-                'brand_name' => $faker->company,
-                'status' => $faker->randomElement(['Active', 'Block']),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
+        $brands = [
+            ['brand_name' => 'Giày Nike', 'status' => 'Active', 'created_at' => now(), 'updated_at' => now()],
+            ['brand_name' => 'Giày Adidas', 'status' => 'Active', 'created_at' => now(), 'updated_at' => now()],
+            ['brand_name' => 'Giày Lacoste', 'status' => 'Active', 'created_at' => now(), 'updated_at' => now()],
+            ['brand_name' => 'Giày Puma', 'status' => 'Active', 'created_at' => now(), 'updated_at' => now()],
+            ['brand_name' => 'Giày Thể Thao', 'status' => 'Active', 'created_at' => now(), 'updated_at' => now()],
+        ];
         DB::table('brands')->insert($brands);
     }
 }
