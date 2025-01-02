@@ -31,15 +31,9 @@
         <!-- /.container-fluid -->
     </section>
 
-    @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
+    <div class="alert alert-danger print-error-msg" style="display:none">
+        <ul></ul>
     </div>
-    @endif
 
     <!-- Main content -->
     <section class="content">
@@ -165,67 +159,104 @@
 <script src="{{ asset('admin-assets/plugins/dropzone/dropzone.js') }}"></script>
 
 <script>
-    Dropzone.autoDiscover = false;
-    var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-    var myDropzone = new Dropzone("#image", {
-        url: "{{ route('admin.shoes.upload_temp') }}",
-        headers: {
-            'X-CSRF-TOKEN': token
-        },
-        init: function() {
-            this.on("success", function(file, response) {
-                var imageUrl = response.filePath;
-                console.log(imageUrl);
-                var uniqueId = file.upload.uuid; // Thêm mã UUID để quản lý các ảnh đã upload
-
-                var cardHtml = '<div class="col-md-3" data-id="' + uniqueId + '">' +
-                    '<div class="card">' +
-                    '<img src="' + imageUrl + '" class="card-img-top" alt="...">' +
-                    '<div class="card-body">' +
-                    '<a class="btn btn-danger delete-image" data-image="' + imageUrl + '">Delete</a>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>';
-
-                document.getElementById('shoe-images').innerHTML += cardHtml;
-                this.removeFile(file);
-            });
-        }
-    });
-
-    $(document).on('click', '.delete-image', function(e) {
-        e.preventDefault();
-
-        var imageUrl = $(this).data('image');
-
-        $.ajax({
-            url: "{{ route('admin.shoes.delete_temp') }}", // Đường dẫn xóa ảnh
-            type: 'POST',
-            data: {
-                _token: token,
-                image_url: imageUrl
-            },
-            success: function(response) {
-                if (response.success) {
-                    $(this).closest('.col-md-3').remove();
-                } else {
-                    alert('Không thể xóa ảnh');
-                }
-            }.bind(this),
-            error: function() {
-                alert('Có lỗi xảy ra!');
-            }
-        });
-    });
-
-
     $(function() {
         $('.summernote').summernote({
             height: '300px'
         });
     });
 </script>
+
+<script>
+    Dropzone.autoDiscover = false;
+
+    let myDropzone = new Dropzone("#image", {
+        url: "{{ route('admin.shoes.upload_shoe') }}",
+        paramName: "inputFiles",
+        autoProcessQueue: false,
+        uploadMultiple: true,
+        parallelUploads: 100,
+        maxFiles: 100,
+        dictDefaultMessage: "Bạn có thể kéo ảnh hoặc click để chọn",
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    });
+
+    myDropzone.on("addedfile", function(file) {
+        var img_shoes = document.getElementById("shoe-images");
+        var newImageDiv = document.createElement("div");
+        newImageDiv.className = "col-md-3";
+        newImageDiv.innerHTML = `
+                <div class="card">
+                    <img src="${URL.createObjectURL(file)}" class="card-img-top" alt="Uploaded Image">
+                    <div class="card-body">
+                        <a href="#" class="btn btn-danger delete-btn">Delete</a>
+                    </div>
+                </div>
+            `;
+
+        img_shoes.appendChild(newImageDiv);
+
+        newImageDiv.querySelector('.delete-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            myDropzone.removeFile(file);
+            newImageDiv.remove();
+        });
+    });
+
+    // Submit form trước khi upload ảnh
+    $("button[type=submit]").on("click", function(e) {
+        e.preventDefault();
+
+        // Gửi form trước khi upload ảnh
+        let form = $('form')[0];
+        let formData = new FormData(form);
+
+        $.ajax({
+            url: "{{ route('admin.shoes.store') }}",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(data) {
+                if ($.isEmptyObject(data.error)) {
+                    let shoeId = data.shoe_id;
+                    myDropzone.on("sendingmultiple", function(files, xhr, formData) {
+                        formData.append("shoe_id", shoeId); // Gửi ID giày lên server cùng ảnh
+                    });
+                    myDropzone.processQueue(); // Tiến hành upload ảnh
+
+                    window.location.href = data.redirect_url;
+                } else {
+                    printErrorMsg(data.error);
+                }
+            },
+
+        });
+    });
+
+    function printErrorMsg(msg) {
+        $(".print-error-msg").find("ul").html('');
+        $(".print-error-msg").css('display', 'block');
+        $.each(msg, function(key, value) {
+            $(".print-error-msg").find("ul").append('<li>' + value + '</li>');
+        });
+    }
+
+
+    // Xử lý khi upload ảnh thành công
+    myDropzone.on("successmultiple", function(files, response) {
+        // console.log('Ảnh đã được upload thành công', response);
+    });
+
+    myDropzone.on("errormultiple", function(files, response) {
+        // console.log(response);
+    });
+</script>
+
 
 
 <!-- Thư viện chọn nhiều item cho select-->

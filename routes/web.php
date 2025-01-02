@@ -65,7 +65,6 @@ Route::middleware([AdminMiddleware::class])->group(function () {
     // Đặt tên cho route lấy danh mục theo thương hiệu
     Route::get('/admin/getCategoriesByBrand/{brand_id}', [ShoeController::class, 'getCategoriesByBrand'])->name('admin.categories.byBrand');
     // routes/web.php
-    Route::post('/admin/upload_temp', [ShoeController::class, 'upload_temp'])->name('admin.shoes.upload_temp');
-    // routes/web.php
-    Route::post('admin/shoes/delete_temp', [ShoeController::class, 'deleteTemp'])->name('admin.shoes.delete_temp');
+    Route::post('/admin/upload_shoe', [ShoeController::class, 'upload_shoe'])->name('admin.shoes.upload_shoe');
+    // Route::post('admin/shoes/delete_temp', [ShoeController::class, 'deleteTemp'])->name('admin.shoes.delete_temp');
 });

@@ -56,6 +56,7 @@
                     <thead>
                         <tr>
                             <th>Mã</th>
+                            <th>Ảnh</th>
                             <th>Tên giày</th>
                             <th>Giá tiền</th>
                             <th>Số lượng</th>
@@ -68,6 +69,13 @@
                         @foreach($shoes as $shoe)
                         <tr>
                             <td>{{ $shoe->id }}</td>
+                            <td>
+                                @if($shoe->images->count() > 0)
+                                <img src="{{ asset($shoe->images->first()->image_url) }}" alt="Shoe Image" style="width: 50px; height: 50px; object-fit: cover;">
+                                @else
+                                <span>Không có ảnh</span>
+                                @endif
+                            </td>
                             <td>{{ $shoe->shoe_name }}</td>
                             <td>{{ $shoe->price }}</td>
                             <td>{{ $shoe->quantity }}</td>

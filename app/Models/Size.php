@@ -10,4 +10,9 @@ class Size extends Model
         'size',
         'status',
     ];
+
+    public function shoes()
+    {
+        return $this->belongsToMany(Shoe::class, 'shoe_sizes');
+    }
 }

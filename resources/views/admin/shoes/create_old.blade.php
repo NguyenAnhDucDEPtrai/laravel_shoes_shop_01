@@ -30,6 +30,17 @@
         </div>
         <!-- /.container-fluid -->
     </section>
+
+    @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
     <!-- Main content -->
     <section class="content">
         <!-- Default box -->
@@ -63,6 +74,10 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="row" id="shoe-images">
+
                     </div>
 
                     <div class="card mb-3">
@@ -134,7 +149,7 @@
             </div>
 
             <div class="pb-5 pt-3">
-                <button class="btn btn-primary">Create</button>
+                <button type="submit" class="btn btn-primary">Lưu</button>
                 <a href="{{ route('admin.shoes.index') }}" class="btn btn-outline-dark ml-3">Cancel</a>
             </div>
         </div>
@@ -151,98 +166,84 @@
 
 <script>
     Dropzone.autoDiscover = false;
+    var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    var myDropzone = new Dropzone("#image", {
+        url: "{{ route('admin.shoes.upload_temp') }}",
+        headers: {
+            'X-CSRF-TOKEN': token
+        },
+        init: function() {
+            this.on("success", function(file, response) {
+                var imageUrl = response.filePath;
+                console.log(imageUrl);
+                var uniqueId = file.upload.uuid; // Thêm mã UUID để quản lý các ảnh đã upload
+
+                var cardHtml = '<div class="col-md-3" data-id="' + uniqueId + '">' +
+                    '<div class="card">' +
+                    '<img src="' + imageUrl + '" class="card-img-top" alt="...">' +
+                    '<div class="card-body">' +
+                    '<a class="btn btn-danger delete-image" data-image="' + imageUrl + '">Delete</a>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+
+                document.getElementById('shoe-images').innerHTML += cardHtml;
+                this.removeFile(file);
+            });
+        }
+    });
+
+    $(document).on('click', '.delete-image', function(e) {
+        e.preventDefault();
+
+        var imageUrl = $(this).data('image');
+
+        $.ajax({
+            url: "{{ route('admin.shoes.delete_temp') }}", // Đường dẫn xóa ảnh
+            type: 'POST',
+            data: {
+                _token: token,
+                image_url: imageUrl
+            },
+            success: function(response) {
+                if (response.success) {
+                    $(this).closest('.col-md-3').remove();
+                } else {
+                    alert('Không thể xóa ảnh');
+                }
+            }.bind(this),
+            error: function() {
+                alert('Có lỗi xảy ra!');
+            }
+        });
+    });
+
 
     $(function() {
-        const dropzone = new Dropzone("#image", {
-            url: "{{ route('admin.upload.image') }}",
-            maxFiles: 5,
-            addRemoveLinks: true,
-            acceptedFiles: "image/jpeg,image/png,image/gif",
-            paramName: "file",
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(file, response) {
-                if (response && response.id) {
-                    console.log("File uploaded successfully with ID: " + response.id);
-                    $("#image_id").val(response.id);
-                    file.upload.filename = response.id; // Lưu tên file vào đối tượng file
-                } else {
-                    console.error("Response không hợp lệ:", response);
-                }
-            },
-            error: function(file, errorMessage) {
-                console.error("Lỗi tải ảnh:", errorMessage);
-            },
-            removedfile: function(file) {
-                var filename = file.upload.filename;
-
-                $.ajax({
-                    type: 'POST',
-                    url: "{{ route('admin.delete.image') }}",
-                    data: {
-                        filename: filename
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(data) {
-                        if (data.success) {
-                            var _ref;
-                            if ((_ref = file.previewElement) != null) {
-                                _ref.parentNode.removeChild(file.previewElement); // Xóa phần tử hình ảnh khỏi giao diện
-                            }
-                            console.log("File deleted successfully");
-                        } else {
-                            console.error(data.message);
-                        }
-                    },
-                    error: function(error) {
-                        console.error("Lỗi xóa file:", error);
-                    }
-                });
-            }
+        $('.summernote').summernote({
+            height: '300px'
         });
     });
 </script>
 
 
-<!-- <script>
-    Dropzone.autoDiscover = false;
-    $(function() {
-        // Summernote
-        $('.summernote').summernote({
-            height: '300px'
-        });
-
-        const dropzone = $("#image").dropzone({
-            url: "create-product.html",
-            maxFiles: 5,
-            addRemoveLinks: true,
-            acceptedFiles: "image/jpeg,image/png,image/gif",
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
-            },
-            success: function(file, response) {
-                // Kiểm tra response từ server
-                if (response && response.id) {
-                    $("#image_id").val(response.id); // Lưu id của ảnh vào trường ẩn
-                    file.uploadedId = response.id; // Lưu id vào đối tượng file của Dropzone
-                } else {
-                    console.error("Response không hợp lệ:", response);
-                }
-            },
-            error: function(file, errorMessage) {
-                console.error("Lỗi tải ảnh:", errorMessage);
-            }
-        });
-    });
-</script> -->
-
 <!-- Thư viện chọn nhiều item cho select-->
 <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.1.0/dist/js/multi-select-tag.js"></script>
 <script>
-    new MultiSelectTag('size_id')
+    new MultiSelectTag("size_id", {
+        rounded: true,
+        shadow: false,
+        placeholder: "Search",
+        tagColor: {
+            textColor: "#327b2c",
+            borderColor: "#92e681",
+            bgColor: "#eaffe6",
+        },
+        // onChange: function(values) {
+        //     console.log(values);
+        // },
+    });
 </script>
 
 <!-- ajax để hiển thị danh mục khi chọc thương hiệu -->
@@ -251,8 +252,10 @@
         let multiSelect;
 
         function loadCategories(brandId) {
+            let url = "{{ route('admin.categories.byBrand', ':brandId') }}".replace(':brandId', brandId);
+
             $.ajax({
-                url: "{{ route('admin.categories.byBrand', '') }}/" + brandId,
+                url: url,
                 method: 'GET',
                 success: function(response) {
                     if (multiSelect) {
@@ -266,12 +269,15 @@
                     multiSelect = new MultiSelectTag('categories', {
                         rounded: true,
                         shadow: false,
-                        placeholder: 'Search',
+                        placeholder: "Search",
                         tagColor: {
-                            textColor: '#327b2c',
-                            borderColor: '#92e681',
-                            bgColor: '#eaffe6',
-                        }
+                            textColor: "#327b2c",
+                            borderColor: "#92e681",
+                            bgColor: "#eaffe6",
+                        },
+                        // onChange: function(values) {
+                        //     console.log(values);
+                        // },
                     });
                 },
                 error: function(xhr, status, error) {

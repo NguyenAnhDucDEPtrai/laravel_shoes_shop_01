@@ -12,6 +12,7 @@ use App\Models\ShoeImage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use App\Http\Requests\ShoeRequest;
+use Illuminate\Support\Facades\Validator;
 
 class ShoeController extends Controller
 {
@@ -21,19 +22,12 @@ class ShoeController extends Controller
         if ($request->has('search') && $request->search != '') {
             $query->where('shoe_name', 'LIKE', '%' . $request->search . '%');
         }
-        $shoes = $query->orderBy('id', 'desc')->paginate(10);
+        $shoes = $query->with('images')->orderBy('id', 'desc')->paginate(10);
         return view('admin.shoes.index', compact('shoes'));
     }
 
     public function create()
     {
-        // Xóa các tập tin trong thư mục uploads_temp
-        $tempPath = public_path('uploads_temp');
-        if (File::exists($tempPath)) {
-            File::cleanDirectory($tempPath);
-        }
-        session()->forget('temp_files');
-
         $brands = Brand::all();
         $sizes = Size::all();
         return view('admin.shoes.create', compact('brands', 'sizes'));
@@ -45,52 +39,57 @@ class ShoeController extends Controller
         return response()->json($categories);
     }
 
-    public function upload_temp(Request $request)
+    public function upload_shoe(Request $request)
     {
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $path = $file->move(public_path('uploads_temp'), $filename);
+        // $this->validate($request, [
+        //     'inputFiles' => 'required|array',
+        //     'inputFiles.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        // ]);
 
-            $tempFiles = session()->get('temp_files', []);
-            $tempFiles[] = $filename;
-            session()->put('temp_files', $tempFiles);
-
-            return response()->json(['filePath' => asset('uploads_temp/' . $filename)]);
+        $shoeId = $request->input('shoe_id');  // Nhận ID giày từ form
+        if (!$shoeId) {
+            return response()->json(['success' => false, 'message' => 'Giày không hợp lệ']);
         }
 
-        return response()->json(['error' => 'No file uploaded'], 400);
-    }
-
-    // ShoeController.php
-    public function deleteTemp(Request $request)
-    {
-        $imageUrl = $request->input('image_url');
-        $fileName = basename($imageUrl); // Lấy tên file từ URL
-
-        $filePath = public_path('uploads_temp/' . $fileName);
-
-        if (file_exists($filePath)) {
-            unlink($filePath); // Xóa file
-            // Xóa file khỏi session (nếu có)
-            $tempFiles = session()->get('temp_files', []);
-            if (($key = array_search($fileName, $tempFiles)) !== false) {
-                unset($tempFiles[$key]);
-            }
-            session()->put('temp_files', $tempFiles);
-
-            return response()->json(['success' => true]);
+        $images = [];
+        foreach ($request->file('inputFiles') as $image) {
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('images_shoes'), $imageName);
+            $images[] = 'images_shoes/' . $imageName;
         }
 
-        return response()->json(['success' => false, 'message' => 'File không tồn tại']);
+        // Lưu ảnh vào cơ sở dữ liệu
+        foreach ($images as $image) {
+            ShoeImage::create([
+                'shoe_id' => $shoeId,
+                'image_url' => $image,
+            ]);
+        }
+
+        session()->flash('success', 'Thêm giày thành công!');
+        return response()->json([
+            'success' => true,
+            'redirect_url' => route('admin.shoes.index')
+        ]);
     }
 
-
-    public function store(ShoeRequest $request)
+    public function store(Request $request)
     {
-        DB::beginTransaction();
+        $validator = Validator::make($request->all(), [
+            'shoe_name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:0',
+            'description' => 'nullable|string',
+            'status' => 'required|in:Active,Block',
+            'brand_id' => 'required|exists:brands,id',
+            'categories' => 'required|array|min:1',
+            'categories.*' => 'exists:categories,id',
+            'size_id' => 'required|array|min:1',
+            'size_id.*' => 'exists:sizes,id',
+        ]);
 
-        try {
+        if ($validator->passes()) {
+
             $shoe = new Shoe();
             $shoe->shoe_name = $request->shoe_name;
             $shoe->price = $request->price;
@@ -115,35 +114,32 @@ class ShoeController extends Controller
                 ]);
             }
 
-            $tempFiles = session()->get('temp_files', []);
-            foreach ($tempFiles as $tempFile) {
-                $sourcePath = public_path('uploads_temp/' . $tempFile);
-                $destinationPath = public_path('uploads_shoes/' . $tempFile);
-
-                if (!file_exists(public_path('uploads_shoes'))) {
-                    mkdir(public_path('uploads_shoes'), 0755, true);
-                }
-
-                if (file_exists($sourcePath)) {
-                    rename($sourcePath, $destinationPath);
-
-                    $shoeImage = new ShoeImage();
-                    $shoeImage->shoe_id = $shoe->id;
-                    $shoeImage->image_url = 'uploads_shoes/' . $tempFile;
-                    $shoeImage->save();
-                }
-            }
-
-            session()->forget('temp_files');
-
-            // dd($shoeImage);
-
-            DB::commit();
-            return redirect()->route('admin.shoes.index')->with('success', 'Thêm giày thành công!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
+            session()->flash('success', 'Thêm giày thành công!');
+            return response()->json([
+                'success' => true,
+                'shoe_id' => $shoe->id,
+                'redirect_url' => route('admin.shoes.index')
+            ]);
         }
+
+        return response()->json(['error' => $validator->errors()->all()]);
+    }
+
+    public function edit($id)
+    {
+        $shoe = Shoe::with(['categories', 'images', 'sizes'])->findOrFail($id);
+        $brands = Brand::all();
+        $sizes = Size::all();
+
+        $firstCategory_current = $shoe->categories->first();
+        $brand_current = null;
+        if ($firstCategory_current) {
+            $brand_current = $firstCategory_current->brand;
+        }
+
+        $categories = Category::where('brand_id', $brand_current->id)->get(['id', 'category_name']);
+
+        return view('admin.shoes.edit', compact('shoe', 'brands', 'categories', 'sizes', 'brand_current'));
     }
 
     public function destroy($id)
