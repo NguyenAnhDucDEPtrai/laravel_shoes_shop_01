@@ -176,6 +176,7 @@
         uploadMultiple: true,
         parallelUploads: 100,
         maxFiles: 100,
+        acceptedFiles: "image/*",
         dictDefaultMessage: "Bạn có thể kéo ảnh hoặc click để chọn",
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')

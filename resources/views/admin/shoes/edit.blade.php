@@ -15,6 +15,7 @@
 
 <form action="{{ route('admin.shoes.update', $shoe->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
+    <input type="hidden" value="{{ $shoe->id }}" id="shoe-id">
 
     <!-- Content Header (Page header) -->
     <section class="content-header">
@@ -80,9 +81,9 @@
                         @foreach($shoe->images as $image)
                         <div class="col-md-3">
                             <div class="card">
-                                <img src="{{ asset($image->image_url) }}" class="card-img-top" alt="...">
+                                <img src="{{ asset($image->image_url) }}" class="card-img-top">
                                 <div class="card-body">
-                                    <a class="btn btn-danger delete-image" data-image="imageUrl">Delete</a>
+                                    <a class="btn btn-danger" data-image-id="{{ $image->id }}">Delete</a>
                                 </div>
                             </div>
                         </div>
@@ -181,65 +182,102 @@
 <script src="{{ asset('admin-assets/plugins/dropzone/dropzone.js') }}"></script>
 
 <script>
-    Dropzone.autoDiscover = false;
-    var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-    var myDropzone = new Dropzone("#image", {
-        url: "{{ route('admin.shoes.upload_shoe') }}",
-        headers: {
-            'X-CSRF-TOKEN': token
-        },
-        init: function() {
-            this.on("success", function(file, response) {
-                var imageUrl = response.filePath;
-                console.log(imageUrl);
-                var uniqueId = file.upload.uuid; // Thêm mã UUID để quản lý các ảnh đã upload
-
-                var cardHtml = '<div class="col-md-3" data-id="' + uniqueId + '">' +
-                    '<div class="card">' +
-                    '<img src="' + imageUrl + '" class="card-img-top" alt="...">' +
-                    '<div class="card-body">' +
-                    '<a class="btn btn-danger delete-image" data-image="' + imageUrl + '">Delete</a>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>';
-
-                document.getElementById('shoe-images').innerHTML += cardHtml;
-                this.removeFile(file);
-            });
-        }
-    });
-
-    $(document).on('click', '.delete-image', function(e) {
-        e.preventDefault();
-
-        var imageUrl = $(this).data('image');
-
-        $.ajax({
-            url: "#", // Đường dẫn xóa ảnh
-            type: 'POST',
-            data: {
-                _token: token,
-                image_url: imageUrl
-            },
-            success: function(response) {
-                if (response.success) {
-                    $(this).closest('.col-md-3').remove();
-                } else {
-                    alert('Không thể xóa ảnh');
-                }
-            }.bind(this),
-            error: function() {
-                alert('Có lỗi xảy ra!');
-            }
-        });
-    });
-
-
     $(function() {
         $('.summernote').summernote({
             height: '300px'
         });
+    });
+</script>
+
+<script>
+    var shoeId = document.getElementById('shoe-id').value;
+
+    //ajax hiển thị danh sách ảnh theo giày
+    function loadShoeImages(shoeId) {
+        var url = "{{ route('admin.shoes.getImagesByShoe', ':shoe_id') }}";
+        url = url.replace(':shoe_id', shoeId);
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function(response) {
+                var imagesContainer = document.getElementById('shoe-images');
+
+                imagesContainer.innerHTML = '';
+
+                response.updatedImages.forEach(function(image) {
+
+                    var imgCard = document.createElement('div');
+                    imgCard.classList.add('col-md-3');
+
+                    imgCard.innerHTML = `
+                        <div class="card">
+                            <img src="{{ asset('${image.image_url}') }}" class="card-img-top">
+                            <div class="card-body">
+                                <a class="btn btn-danger" data-image-id="${image.id}">Delete</a>
+                            </div>
+                        </div>
+                    `;
+
+                    imagesContainer.appendChild(imgCard);
+                });
+            },
+            error: function() {
+                alert('Có lỗi xảy ra!');
+            }
+        });
+    }
+
+    // Xử lý xóa ảnh khi nhấn vào nút "Delete"
+    $(document).on('click', '.btn-danger', function() {
+
+        var imageId = $(this).data('image-id'); // Lấy ID ảnh từ data-attribute     
+        var url = "{{ route('admin.shoes.deleteImage', ':image_id') }}";
+        url = url.replace(':image_id', imageId);
+
+        if (confirm('Bạn có chắc muốn xóa ảnh này?')) {
+            $.ajax({
+                url: url,
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    loadShoeImages(shoeId)
+                },
+
+            });
+        }
+    });
+
+
+    //dropzone upload ảnh
+    Dropzone.autoDiscover = false;
+
+    let myDropzone = new Dropzone("#image", {
+        url: "{{ route('admin.shoes.update_img_shoes') }}",
+        paramName: "inputFiles",
+        uploadMultiple: true,
+        parallelUploads: 100,
+        maxFiles: 100,
+        acceptedFiles: "image/*",
+        dictDefaultMessage: "Bạn có thể kéo ảnh hoặc click để chọn",
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    });
+
+    myDropzone.on("sending", function(file, xhr, formData) {
+        formData.append("shoe_id", shoeId);
+    });
+
+    // Xử lý khi upload ảnh thành công
+    myDropzone.on("success", function(files, response) {
+        loadShoeImages(shoeId)
+        myDropzone.removeAllFiles(true);
+    });
+
+    myDropzone.on("error", function(files, response) {
+        // console.log(response);
     });
 </script>
 

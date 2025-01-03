@@ -39,14 +39,18 @@ class ShoeController extends Controller
         return response()->json($categories);
     }
 
+    public function getImagesByShoe($shoeId)
+    {
+        $updatedImages = ShoeImage::where('shoe_id', $shoeId)->get();
+        return response()->json([
+            'success' => 'Images uploaded successfully',
+            'updatedImages' => $updatedImages
+        ]);
+    }
+
     public function upload_shoe(Request $request)
     {
-        // $this->validate($request, [
-        //     'inputFiles' => 'required|array',
-        //     'inputFiles.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        // ]);
-
-        $shoeId = $request->input('shoe_id');  // Nhận ID giày từ form
+        $shoeId = $request->input('shoe_id');
         if (!$shoeId) {
             return response()->json(['success' => false, 'message' => 'Giày không hợp lệ']);
         }
@@ -58,7 +62,6 @@ class ShoeController extends Controller
             $images[] = 'images_shoes/' . $imageName;
         }
 
-        // Lưu ảnh vào cơ sở dữ liệu
         foreach ($images as $image) {
             ShoeImage::create([
                 'shoe_id' => $shoeId,
@@ -72,6 +75,44 @@ class ShoeController extends Controller
             'redirect_url' => route('admin.shoes.index')
         ]);
     }
+
+    public function update_img_shoes(Request $request)
+    {
+        $shoeId = $request->input('shoe_id');
+
+        $images = [];
+        foreach ($request->file('inputFiles') as $image) {
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('images_shoes'), $imageName);
+            $images[] = 'images_shoes/' . $imageName;
+        }
+
+        foreach ($images as $image) {
+            ShoeImage::create([
+                'shoe_id' => $shoeId,
+                'image_url' => $image,
+            ]);
+        }
+
+        return response()->json([
+            'success' => 'Images uploaded successfully',
+        ]);
+    }
+
+    public function deleteImage($imageId)
+    {
+        $image = ShoeImage::find($imageId);
+        dump($image);
+        $imagePath = public_path($image->image_url);
+        if (file_exists($imagePath)) {
+            unlink($imagePath);
+        }
+
+        $image->delete();
+
+        return response()->json(['success' => 'Image deleted successfully']);
+    }
+
 
     public function store(Request $request)
     {
