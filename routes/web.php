@@ -22,6 +22,8 @@ use App\Http\Middleware\AdminMiddleware;
 Route::get('/', [FrontController::class, 'home'])->name('front.home');
 Route::get('/shopByBrand/{id}', [ShopController::class, 'shopByBrand'])->name('front.shopByBrand');
 Route::get('/filter-shoes/{id}', [ShopController::class, 'filterShoes'])->name('front.filterShoes');
+Route::get('/shoe-detail/{id}', [ShopController::class, 'shoeDetail'])->name('front.shoeDetail');
+
 
 
 

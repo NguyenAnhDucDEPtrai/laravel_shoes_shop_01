@@ -29,34 +29,39 @@ class ShopController extends Controller
     public function filterShoes(Request $request, $id)
     {
         $categoryIds = $request->input('categories', []);
-        $sizeIds = $request->input('sizes', []); // Nhận giá trị từ filter size
+        $sizeIds = $request->input('sizes', []);
 
         $brand = Brand::find($id);
         $categories = $brand->categories;
 
-        // Xây dựng query để lọc theo category
         $shoesQuery = Shoe::whereHas('categories', function ($query) use ($categories) {
             $query->whereIn('categories.id', $categories->pluck('id')->toArray());
         });
 
-        // Nếu có chọn filter theo category, thêm điều kiện vào query
         if (!empty($categoryIds)) {
             $shoesQuery->whereHas('categories', function ($query) use ($categoryIds) {
                 $query->whereIn('categories.id', $categoryIds);
             });
         }
 
-        // Nếu có chọn filter theo size, thêm điều kiện vào query
         if (!empty($sizeIds)) {
             $shoesQuery->whereHas('sizes', function ($query) use ($sizeIds) {
                 $query->whereIn('sizes.id', $sizeIds);
             });
         }
 
-        // Lấy danh sách giày sau khi lọc
         $shoes = $shoesQuery->with('images')->get();
 
-        // Trả về kết quả dưới dạng HTML (dùng để cập nhật lại giày trong view mà không reload trang)
         return view('front.partials.shoe-list', compact('shoes'));
+    }
+
+    public function shoeDetail($id)
+    {
+        //header
+        $brands = Brand::with('categories')->get();
+        
+        //shop
+        $shoe = Shoe::with('images', 'sizes')->find($id);
+        return view('front.shoeDetail', compact('brands', 'shoe'));
     }
 }
