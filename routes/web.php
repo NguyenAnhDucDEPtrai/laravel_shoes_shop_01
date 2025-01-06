@@ -59,7 +59,7 @@ Route::middleware([AdminMiddleware::class])->group(function () {
     Route::get('/admin/shoes/create', [ShoeController::class, 'create'])->name('admin.shoes.create');
     Route::post('/admin/shoes/store', [ShoeController::class, 'store'])->name('admin.shoes.store');
     Route::get('/admin/shoes/{id}/edit', [ShoeController::class, 'edit'])->name('admin.shoes.edit');
-    Route::put('/admin/shoes/{id}', [ShoeController::class, 'update'])->name('admin.shoes.update');
+    Route::post('/admin/shoes/{id}', [ShoeController::class, 'update'])->name('admin.shoes.update');
     Route::delete('/admin/shoes/{id}', [ShoeController::class, 'destroy'])->name('admin.shoes.destroy');
 
     // Đặt tên cho route lấy danh mục theo thương hiệu
@@ -67,6 +67,5 @@ Route::middleware([AdminMiddleware::class])->group(function () {
     Route::post('/admin/upload_shoe', [ShoeController::class, 'upload_shoe'])->name('admin.shoes.upload_shoe');
     Route::post('/admin/update_img_shoes', [ShoeController::class, 'update_img_shoes'])->name('admin.shoes.update_img_shoes');
     Route::get('/admin/shoe-images/{shoeId}', [ShoeController::class, 'getImagesByShoe'])->name('admin.shoes.getImagesByShoe');
-    // Tạo route xóa ảnh
     Route::delete('/admin/shoes/delete_image/{imageId}', [ShoeController::class, 'deleteImage'])->name('admin.shoes.deleteImage');
 });

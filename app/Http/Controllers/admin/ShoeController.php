@@ -183,6 +183,61 @@ class ShoeController extends Controller
         return view('admin.shoes.edit', compact('shoe', 'brands', 'categories', 'sizes', 'brand_current'));
     }
 
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'shoe_name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:0',
+            'description' => 'nullable|string',
+            'status' => 'required|in:Active,Block',
+            'brand_id' => 'required|exists:brands,id',
+            'categories' => 'required|array|min:1',
+            'categories.*' => 'exists:categories,id',
+            'size_id' => 'required|array|min:1',
+            'size_id.*' => 'exists:sizes,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->all()]);
+        }
+
+        if ($validator->passes()) {
+            $shoe = Shoe::find($id);
+            $shoe->shoe_name = $request->shoe_name;
+            $shoe->price = $request->price;
+            $shoe->description = $request->description;
+            $shoe->quantity = $request->quantity;
+            $shoe->status = $request->status;
+            $shoe->save();
+
+            DB::table('shoe_categories')->where('shoe_id', $shoe->id)->delete();
+            $categoryIds = $request->input('categories', []);
+            foreach ($categoryIds as $categoryId) {
+                DB::table('shoe_categories')->insert([
+                    'shoe_id' => $shoe->id,
+                    'category_id' => $categoryId,
+                ]);
+            }
+
+            DB::table('shoe_sizes')->where('shoe_id', $shoe->id)->delete();
+            $sizeIds = $request->input('size_id', []);
+            foreach ($sizeIds as $sizeId) {
+                DB::table('shoe_sizes')->insert([
+                    'shoe_id' => $shoe->id,
+                    'size_id' => $sizeId,
+                ]);
+            }
+
+            session()->flash('success', 'Thêm giày thành công!');
+            return response()->json([
+                'success' => true,
+                'redirect_url' => route('admin.shoes.index')
+            ]);
+        }
+    }
+
+
     public function destroy($id)
     {
         $shoe = Shoe::find($id);

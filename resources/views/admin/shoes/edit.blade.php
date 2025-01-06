@@ -32,15 +32,9 @@
         <!-- /.container-fluid -->
     </section>
 
-    @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
+    <div class="alert alert-danger print-error-msg" style="display:none">
+        <ul></ul>
     </div>
-    @endif
 
     <!-- Main content -->
     <section class="content">
@@ -248,6 +242,43 @@
             });
         }
     });
+
+    // cập nhật giày
+    $("button[type=submit]").on("click", function(e) {
+        e.preventDefault();
+
+        let form = $('form')[0];
+        let formData = new FormData(form);
+
+        var url = "{{ route('admin.shoes.update', ':shoe_id') }}";
+        url = url.replace(':shoe_id', shoeId);
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(data) {
+                if ($.isEmptyObject(data.error)) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    printErrorMsg(data.error);
+                }
+            },
+
+        });
+    });
+
+    function printErrorMsg(msg) {
+        $(".print-error-msg").find("ul").html('');
+        $(".print-error-msg").css('display', 'block');
+        $.each(msg, function(key, value) {
+            $(".print-error-msg").find("ul").append('<li>' + value + '</li>');
+        });
+    }
 
 
     //dropzone upload ảnh
