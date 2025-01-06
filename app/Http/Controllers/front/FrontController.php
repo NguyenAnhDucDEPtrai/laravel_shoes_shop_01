@@ -11,7 +11,6 @@ class FrontController extends Controller
     public function home()
     {
         $brands = Brand::with('categories')->get();
-
         return view('front.home', compact('brands'));
     }
 }

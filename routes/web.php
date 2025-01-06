@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 // front
 use App\Http\Controllers\front\FrontController;
+use App\Http\Controllers\front\ShopController;
+
 
 // admin
 use App\Http\Controllers\admin\AdminLoginController;
@@ -18,10 +20,8 @@ use App\Http\Middleware\AdminMiddleware;
 
 // Front
 Route::get('/', [FrontController::class, 'home'])->name('front.home');
-
-
-
-
+Route::get('/shopByBrand/{id}', [ShopController::class, 'shopByBrand'])->name('front.shopByBrand');
+Route::get('/filter-shoes/{id}', [ShopController::class, 'filterShoes'])->name('front.filterShoes');
 
 
 
