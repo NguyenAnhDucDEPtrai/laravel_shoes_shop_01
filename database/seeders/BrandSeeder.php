@@ -15,12 +15,13 @@ class BrandSeeder extends Seeder
     public function run(): void
     {
         $brands = [
-            ['brand_name' => 'Giày Nike', 'status' => 'Active', 'created_at' => now(), 'updated_at' => now()],
-            ['brand_name' => 'Giày Adidas', 'status' => 'Active', 'created_at' => now(), 'updated_at' => now()],
-            ['brand_name' => 'Giày Lacoste', 'status' => 'Active', 'created_at' => now(), 'updated_at' => now()],
-            ['brand_name' => 'Giày Puma', 'status' => 'Active', 'created_at' => now(), 'updated_at' => now()],
-            ['brand_name' => 'Giày Thể Thao', 'status' => 'Active', 'created_at' => now(), 'updated_at' => now()],
+            ['brand_name' => 'Giày Nike', 'status' => 'Active', 'image' => null, 'created_at' => now(), 'updated_at' => now()],
+            ['brand_name' => 'Giày Adidas', 'status' => 'Active', 'image' => null, 'created_at' => now(), 'updated_at' => now()],
+            ['brand_name' => 'Giày Lacoste', 'status' => 'Active', 'image' => null, 'created_at' => now(), 'updated_at' => now()],
+            ['brand_name' => 'Giày Puma', 'status' => 'Active', 'image' => null, 'created_at' => now(), 'updated_at' => now()],
+            ['brand_name' => 'Giày Thể Thao', 'status' => 'Active', 'image' => null, 'created_at' => now(), 'updated_at' => now()],
         ];
+
         DB::table('brands')->insert($brands);
     }
 }

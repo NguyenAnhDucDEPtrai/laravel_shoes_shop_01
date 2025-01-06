@@ -29,7 +29,7 @@
     <!-- Default box -->
     <div class="container-fluid">
 
-        <form action="{{ route('admin.brands.update', $brand->id) }}" method="post">
+        <form action="{{ route('admin.brands.update', $brand->id) }}" method="post" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="card">
@@ -56,6 +56,23 @@
                                 @enderror
                             </div>
                         </div>
+
+                        <!-- Thêm phần input ảnh -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="image">Ảnh thương hiệu</label>
+                                <input type="file" name="image" id="image" class="form-control">
+                                <br>
+                                <!-- Hiển thị ảnh cũ nếu có -->
+                                @if($brand->image)
+                                <img src="{{ asset($brand->image) }}" alt="Ảnh thương hiệu" width="100">
+                                @endif
+                                @error('image')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

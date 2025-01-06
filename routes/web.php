@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+// front
+use App\Http\Controllers\front\FrontController;
 
+// admin
 use App\Http\Controllers\admin\AdminLoginController;
 use App\Http\Controllers\admin\HomeController;
 use App\Http\Controllers\admin\BrandController;
@@ -11,6 +14,16 @@ use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\admin\ShoeController;
 
 use App\Http\Middleware\AdminMiddleware;
+
+
+// Front
+Route::get('/', [FrontController::class, 'home'])->name('front.home');
+
+
+
+
+
+
 
 // login admin
 Route::get('/admin/register', [AdminLoginController::class, 'view_register'])->name('admin.view_register');

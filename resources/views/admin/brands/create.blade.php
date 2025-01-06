@@ -28,8 +28,9 @@
 <section class="content">
     <!-- Default box -->
     <div class="container-fluid">
-        
-        <form action="{{ route('admin.brands.store') }}" method="post">
+
+        <form action="{{ route('admin.brands.store') }}" method="post" enctype="multipart/form-data">
+
             @csrf
             <div class="card">
                 <div class="card-body">
@@ -51,6 +52,17 @@
                                     <option value="Block" {{ 'Block' == old('status') ? 'selected' : '' }}>Chặn</option>
                                 </select>
                                 @error('status')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Thêm phần input ảnh -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="image">Ảnh thương hiệu</label>
+                                <input type="file" name="image" id="image" class="form-control">
+                                @error('image')
                                 <div class="alert alert-danger">{{ $message }}</div>
                                 @enderror
                             </div>

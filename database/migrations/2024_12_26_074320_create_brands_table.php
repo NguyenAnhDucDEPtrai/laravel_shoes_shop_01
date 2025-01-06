@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('brand_name', 100)->unique();
             $table->enum('status', ['Active', 'Block']);
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

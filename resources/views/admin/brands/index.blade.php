@@ -56,6 +56,7 @@
                     <thead>
                         <tr>
                             <th width="60">Mã</th>
+                            <th>Ảnh</th>
                             <th>Tên thương hiệu</th>
                             <th width="100">Trạng thái</th>
                             <th width="100">Hành động</th>
@@ -66,6 +67,13 @@
                         @foreach($brands as $brand)
                         <tr>
                             <td>{{ $brand->id }}</td>
+                            <td>
+                                @if($brand->image)
+                                <img src="{{ asset($brand->image) }}" alt="{{ $brand->brand_name }}" width="50" height="50">
+                                @else
+                                <span>Không có ảnh</span>
+                                @endif
+                            </td>
                             <td>{{ $brand->brand_name }}</td>
                             <td>
                                 @if($brand->status == 'Active')
