@@ -7,71 +7,121 @@ use Illuminate\Http\Request;
 use App\Models\Brand;
 use App\Models\Shoe;
 use App\Models\Size;
+use Illuminate\Support\Facades\Session;
 
 class CartController extends Controller
 {
-    public function index()
-    {
-        $brands = Brand::with('categories')->get();
-        return view('front.cart', compact('brands'));
-    }
-
-    // Hàm để hiển thị giỏ hàng
     public function showCart()
     {
         //header
         $brands = Brand::with('categories')->get();
 
-        $cart = session()->get('cart', []);
-        return view('front.cart', compact('brands', 'cart'));
+        //cart
+        $cart = Session::get('cart', []);
+        $total = 0;
+        foreach ($cart as $item) {
+            $total += $item['price'] * $item['quantity'];
+        }
+        return view('front.cart', compact('brands', 'cart', 'total'));
     }
 
-    // Hàm để thêm sản phẩm vào giỏ hàng
-    public function addToCart(Request $request, $id)
+    public function addToCart(Request $request, $shoeId)
     {
-        $shoe = Shoe::find($id);
-        $sizeId = $request->size; // Chọn cỡ giày
-        $size = Size::find($sizeId);
-        // Kiểm tra nếu sản phẩm đã có trong giỏ hàng
-        $cart = session()->get('cart', []);
+        $shoe = Shoe::findOrFail($shoeId);
+        $sizeId = $request->input('size');
+        $size = $shoe->sizes()->find($sizeId);
 
-        $cart[$id] = [
-            'name' => $shoe->shoe_name,
-            'price' => $shoe->price,
-            'size' => $size->size,
-            'quantity' => isset($cart[$id]) ? $cart[$id]['quantity'] + 1 : 1,
-            'image' => $shoe->images->first()->image_url,  // Lấy ảnh đầu tiên của sản phẩm
-        ];
+        $stockQuantity = $shoe->sizes()->where('size_id', $sizeId)->first()->pivot->stock_quantity;
+        $cart = Session::get('cart', []);
 
-        // Lưu lại giỏ hàng vào session
-        session()->put('cart', $cart);
-
-        return redirect()->route('cart.show')->with('success', 'Product added to cart!');
-    }
-
-    // Hàm để xóa sản phẩm khỏi giỏ hàng
-    public function removeFromCart($id)
-    {
-        $cart = session()->get('cart', []);
-
-        if (isset($cart[$id])) {
-            unset($cart[$id]);
-            session()->put('cart', $cart);
+        $exists = false;
+        foreach ($cart as &$item) {
+            if ($item['shoe_id'] == $shoe->id && $item['size_id'] == $size->id) {
+                if ($item['quantity'] >= $stockQuantity) {
+                    return redirect()->route('cart.show')->with('error', 'Số lượng trong giỏ hàng đã vượt quá số lượng tồn kho!');
+                }
+                $item['quantity']++;
+                $exists = true;
+                break;
+            }
         }
 
-        return redirect()->route('cart.show')->with('success', 'Product removed from cart!');
-    }
+        if (!$exists) {
+            if (1 > $stockQuantity) {
+                return redirect()->route('cart.show')->with('error', 'Số lượng giày không đủ trong kho!');
+            }
 
-    // Hàm để cập nhật số lượng sản phẩm trong giỏ hàng
-    public function updateCart(Request $request, $id)
-    {
-        $cart = session()->get('cart', []);
-
-        if (isset($cart[$id])) {
-            $cart[$id]['quantity'] = $request->quantity;
-            session()->put('cart', $cart);
+            $cart[] = [
+                'shoe_id' => $shoe->id,
+                'shoe_name' => $shoe->shoe_name,
+                'size_id' => $size->id,
+                'size' => $size->size,
+                'price' => $shoe->price,
+                'quantity' => 1,
+                'image_url' => $shoe->images()->first()->image_url,
+            ];
         }
 
-        return redirect()->route('cart.show')->with('success', 'Cart updated!');
+        Session::put('cart', $cart);
+
+        return redirect()->route('cart.show')->with('success', 'Giày đã được thêm vào giỏ hàng!');
+    }
+
+    // Tăng số lượng
+    public function increaseQuantity($shoeId, $sizeId)
+    {
+        $shoe = Shoe::findOrFail($shoeId);
+        $stockQuantity = $shoe->sizes()->where('size_id', $sizeId)->first()->pivot->stock_quantity;
+        $cart = Session::get('cart', []);
+
+        foreach ($cart as &$item) {
+            if ($item['shoe_id'] == $shoeId && $item['size_id'] == $sizeId) {
+                if ($item['quantity'] >= $stockQuantity) {
+                    return redirect()->route('cart.show')->with('error', 'Số lượng trong giỏ hàng đã vượt quá số lượng tồn kho!');
+                }
+                $item['quantity']++;
+                break;
+            }
+        }
+
+        Session::put('cart', $cart);
+
+        return redirect()->route('cart.show');
+    }
+
+    // Giảm số lượng
+    public function decreaseQuantity($shoeId, $sizeId)
+    {
+        $cart = Session::get('cart', []);
+
+        foreach ($cart as &$item) {
+            if ($item['shoe_id'] == $shoeId && $item['size_id'] == $sizeId) {
+                if ($item['quantity'] > 1) {
+                    $item['quantity']--;
+                }
+                break;
+            }
+        }
+
+        Session::put('cart', $cart);
+
+        return redirect()->route('cart.show');
+    }
+
+
+    public function removeFromCart($shoeId, $sizeId)
+    {
+        $cart = Session::get('cart', []);
+
+        foreach ($cart as $key => $item) {
+            if ($item['shoe_id'] == $shoeId && $item['size_id'] == $sizeId) {
+                unset($cart[$key]);
+                break;
+            }
+        }
+
+        Session::put('cart', $cart);
+
+        return redirect()->route('cart.show')->with('success', 'Giày đã được xóa khỏi giỏ hàng!');
     }
 }

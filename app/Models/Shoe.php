@@ -15,8 +15,9 @@ class Shoe extends Model
 
     public function sizes()
     {
-        return $this->belongsToMany(Size::class, 'shoe_sizes');
+        return $this->belongsToMany(Size::class, 'shoe_sizes', 'shoe_id', 'size_id')->withPivot('stock_quantity');
     }
+
 
     public function images()
     {

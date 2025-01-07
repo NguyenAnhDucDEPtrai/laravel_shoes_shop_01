@@ -27,9 +27,11 @@ Route::get('/shoe-detail/{id}', [ShopController::class, 'shoeDetail'])->name('fr
 
 //cart
 Route::get('/cart', [CartController::class, 'showCart'])->name('cart.show');
-Route::post('/cart/add/{id}', [CartController::class, 'addToCart'])->name('cart.add');
-Route::post('/cart/update/{id}', [CartController::class, 'updateCart'])->name('cart.update');
-Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+Route::post('/cart/add/{shoeId}', [CartController::class, 'addToCart'])->name('cart.add');
+Route::get('/cart/remove/{shoeId}/{sizeId}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+Route::get('/cart/increase/{shoeId}/{sizeId}', [CartController::class, 'increaseQuantity'])->name('cart.increase');
+Route::get('/cart/decrease/{shoeId}/{sizeId}', [CartController::class, 'decreaseQuantity'])->name('cart.decrease');
+
 
 
 

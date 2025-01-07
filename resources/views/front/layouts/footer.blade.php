@@ -3,34 +3,35 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="footer-card">
-                    <h3>Get In Touch</h3>
-                    <p>No dolore ipsum accusam no lorem. <br>
-                        123 Street, New York, USA <br>
-                        exampl@example.com <br>
-                        000 000 0000</p>
+                    <h3>Liên Hệ Với Chúng Tôi</h3>
+                    <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn! Đừng ngần ngại liên hệ với chúng tôi nếu bạn có bất kỳ câu hỏi nào. <br>
+                        Địa chỉ: 123 Đường ABC, Việt Nam <br>
+                        Email: support@amazingshop.vn <br>
+                        Số điện thoại: 0901 234 XXX</p>
+
                 </div>
             </div>
 
             <div class="col-md-4">
                 <div class="footer-card">
-                    <h3>Important Links</h3>
+                    <h3>Liên Kết Quan Trọng</h3>
                     <ul>
-                        <li><a href="#" title="About">About</a></li>
-                        <li><a href="#" title="Contact Us">Contact Us</a></li>
-                        <li><a href="#" title="Privacy">Privacy</a></li>
-                        <li><a href="#" title="Privacy">Terms & Conditions</a></li>
-                        <li><a href="#" title="Privacy">Refund Policy</a></li>
+                        <li><a href="#" title="Giới Thiệu">Giới Thiệu</a></li>
+                        <li><a href="#" title="Liên Hệ">Liên Hệ</a></li>
+                        <li><a href="#" title="Chính Sách Bảo Mật">Chính Sách Bảo Mật</a></li>
+                        <li><a href="#" title="Điều Khoản & Điều Kiện">Điều Khoản & Điều Kiện</a></li>
+                        <li><a href="#" title="Chính Sách Hoàn Tiền">Chính Sách Hoàn Tiền</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="col-md-4">
                 <div class="footer-card">
-                    <h3>My Account</h3>
+                    <h3>Tài Khoản Của Tôi</h3>
                     <ul>
-                        <li><a href="#" title="Sell">Login</a></li>
-                        <li><a href="#" title="Advertise">Register</a></li>
-                        <li><a href="#" title="Contact Us">My Orders</a></li>
+                        <li><a href="#" title="Đăng Nhập">Đăng Nhập</a></li>
+                        <li><a href="#" title="Đăng Ký">Đăng Ký</a></li>
+                        <li><a href="#" title="Đơn Hàng Của Tôi">Đơn Hàng Của Tôi</a></li>
                     </ul>
                 </div>
             </div>
@@ -41,7 +42,7 @@
             <div class="row">
                 <div class="col-12 mt-3">
                     <div class="copy-right text-center">
-                        <p>© Copyright 2022 Amazing Shop. All Rights Reserved</p>
+                        <p>©Dự án vui vẻ!</p>
                     </div>
                 </div>
             </div>

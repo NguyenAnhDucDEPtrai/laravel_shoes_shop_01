@@ -36,7 +36,8 @@
                 <div class="col-md-7">
                     <div class="bg-light right">
                         <h1>{{ $shoe->shoe_name }}</h1>
-                        <h2 class="price ">${{ $shoe->price }}</h2>
+                        <h2 class="price ">{{ number_format($shoe->price, 0, ',', '.') }} đ</h2>
+
                         <p>{!! $shoe->description !!}</p>
 
                         <!-- Add Size Selection (Radio Buttons) -->
@@ -44,24 +45,26 @@
                             @csrf
                             <div class="size-selection">
                                 <label for="size">Chọn cỡ giày:</label><br>
-                                @foreach($shoe->sizes as $size)
+                                @foreach($shoe->sizes as $index => $size)
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="size" id="size{{ $size->id }}" value="{{ $size->id }}">
+                                    <input class="form-check-input" type="radio" name="size" id="size{{ $size->id }}" value="{{ $size->id }}"
+                                        @if($index==0) checked @endif>
                                     <label class="form-check-label" for="size{{ $size->id }}">{{ $size->size }}</label>
                                 </div>
                                 @endforeach
                             </div>
 
-                            <button type="submit" class="btn btn-dark mt-4"><i class="fas fa-shopping-cart"></i> &nbsp;ADD TO CART</button>
+                            <button type="submit" class="btn btn-dark mt-4"><i class="fas fa-shopping-cart"></i> &nbsp;THÊM GIỎ HÀNG</button>
                         </form>
                     </div>
                 </div>
 
+                <!-- Tab list 3 cái -->
                 <div class="col-md-12 mt-5">
                     <div class="bg-light">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Description</button>
+                                <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Mô tả</button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="shipping-tab" data-bs-toggle="tab" data-bs-target="#shipping" type="button" role="tab" aria-controls="shipping" aria-selected="false">Shipping & Returns</button>
@@ -87,10 +90,11 @@
         </div>
     </section>
 
+    <!-- sản phẩm liên quan -->
     <section class="pt-5 section-8">
         <div class="container">
             <div class="section-title">
-                <h2>Related Products</h2>
+                <h2>Sản phẩm liên quan</h2>
             </div>
             <div class="col-md-12">
                 <div id="related-products" class="carousel">

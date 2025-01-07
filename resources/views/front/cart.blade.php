@@ -1,99 +1,97 @@
 @include('front.layouts.header')
-
 <main>
     <section class="section-5 pt-3 pb-3 mb-3 bg-white">
         <div class="container">
             <div class="light-font">
                 <ol class="breadcrumb primary-color mb-0">
-                    <li class="breadcrumb-item"><a class="white-text" href="#">Home</a></li>
-                    <li class="breadcrumb-item"><a class="white-text" href="#">Shop</a></li>
-                    <li class="breadcrumb-item">Cart</li>
+                    <li class="breadcrumb-item"><a class="white-text" href="#">Tran chủ</a></li>
+                    <li class="breadcrumb-item"><a class="white-text" href="#">Cửa hàng</a></li>
+                    <li class="breadcrumb-item">Giỏ hàng</li>
                 </ol>
             </div>
         </div>
     </section>
-
-    @if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-    @endif
 
     <section class=" section-9 pt-4">
         <div class="container">
             <div class="row">
                 <div class="col-md-8">
                     <div class="table-responsive">
-                        @if(count($cart) > 0)
+
+                        @if(session('error'))
+                        <div class="alert alert-danger mt-3">
+                            {{ session('error') }}
+                        </div>
+                        @endif
+                        @if(session('success'))
+                        <div class="alert alert-success mt-3">
+                            {{ session('success') }}
+                        </div>
+                        @endif
                         <table class="table" id="cart">
                             <thead>
                                 <tr>
-                                    <th>Product</th>
-                                    <th>Size</th>
-                                    <th>Quantity</th>
-                                    <th>Price</th>
-                                    <th>Action</th>
+                                    <th>Id</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Tên giày</th>
+                                    <th>Số lượng</th>
+                                    <th>Đơn giá</th>
+                                    <th>Thành tiền</th>
+                                    <th>Xóa</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($cart as $id => $item)
+                                @foreach($cart as $item)
                                 <tr>
+                                    <td>{{ $item['shoe_id'] }}</td>
+                                    <td><img src="{{ asset($item['image_url']) }}" width="100" height="100"></td>
+                                    <td>{{ $item['shoe_name'] }}<br><span style="font-weight: bold;">Chọn size: {{ $item['size'] }}</span></td>
+
                                     <td>
-                                        <img src="{{ asset($item['image']) }}" alt="{{ $item['name'] }}" width="50">
-                                        {{ $item['name'] }}
+                                        <div class="input-group quantity mx-auto" style="width: 100px;">
+                                            <div class="input-group-btn">
+                                                <a href="{{ route('cart.decrease', ['shoeId' => $item['shoe_id'], 'sizeId' => $item['size_id']]) }}" class="btn btn-sm btn-dark btn-minus p-2 pt-1 pb-1">
+                                                    <i class="fa fa-minus"></i>
+                                                </a>
+                                            </div>
+                                            <input type="text" class="form-control form-control-sm  border-0 text-center" value="{{ $item['quantity'] }}" readonly>
+                                            <div class="input-group-btn">
+                                                <a href="{{ route('cart.increase', ['shoeId' => $item['shoe_id'], 'sizeId' => $item['size_id']]) }}" class="btn btn-sm btn-dark btn-plus p-2 pt-1 pb-1">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td>{{ $item['size'] }}</td>
+                                    <td>{{ number_format($item['price'], 0, ',', '.') }} đ</td>
+                                    <td>{{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }} đ</td>
                                     <td>
-                                        <form action="{{ route('cart.update', $id) }}" method="POST">
-                                            @csrf
-                                            <input type="number" name="quantity" value="{{ $item['quantity'] }}" min="1">
-                                            <button type="submit">Update</button>
-                                        </form>
-                                    </td>
-                                    <td>${{ $item['price'] * $item['quantity'] }}</td>
-                                    <td>
-                                        <form action="{{ route('cart.remove', $id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">Remove</button>
-                                        </form>
+                                        <a href="{{ route('cart.remove', ['shoeId' => $item['shoe_id'], 'sizeId' => $item['size_id']]) }}" class="btn btn-sm btn-danger">
+                                            <i class="fa fa-times"></i>
+                                        </a>
                                     </td>
                                 </tr>
                                 @endforeach
                             </tbody>
                         </table>
-                        @else
-                        <h4>Giỏ hàng trống.</h4>
-                        @endif
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card cart-summery">
                         <div class="sub-title">
-                            <h2 class="bg-white">Cart Summery</h3>
+                            <h2 class="bg-white">Tóm tắt giỏ hàng</h3>
                         </div>
                         <div class="card-body">
-                            <div class="d-flex justify-content-between pb-2">
-                                <div>Subtotal</div>
-                                <div>$400</div>
-                            </div>
-                            <div class="d-flex justify-content-between pb-2">
-                                <div>Shipping</div>
-                                <div>$20</div>
-                            </div>
+
                             <div class="d-flex justify-content-between summery-end">
-                                <div>Total</div>
-                                <div>$420</div>
+                                <div>Tổng Cộng</div>
+                                <div>{{ number_format($total, 0, ',', '.') }} đ</div>
                             </div>
                             <div class="pt-5">
-                                <a href="login.php" class="btn-dark btn btn-block w-100">Proceed to Checkout</a>
+                                <a href="#" class="btn-dark btn btn-block w-100">Đặt hàng</a>
                             </div>
                         </div>
                     </div>
-                    <div class="input-group apply-coupan mt-4">
-                        <input type="text" placeholder="Coupon Code" class="form-control">
-                        <button class="btn btn-dark" type="button" id="button-addon2">Apply Coupon</button>
-                    </div>
+
                 </div>
             </div>
         </div>
