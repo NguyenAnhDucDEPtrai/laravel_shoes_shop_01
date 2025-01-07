@@ -84,12 +84,6 @@
                                         <input value="{{ old('price') }}" type="text" name="price" id="sku" class="form-control" placeholder="Giá tiền">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="barcode">Số lượng</label>
-                                        <input value="{{ old('quantity') }}" type="text" name="quantity" id="barcode" class="form-control" placeholder="Số lượng">
-                                    </div>
-                                </div>
 
                             </div>
                         </div>
@@ -128,17 +122,19 @@
                     </div>
                     <div class="card mb-3">
                         <div class="card-body">
-                            <h2 class="h4 mb-3">Cỡ giày</h2>
+                            <h2 class="h4 mb-3">Cỡ giày & Số lượng tồn kho</h2>
                             <div class="mb-3">
+                                <label for="size_id">Cỡ giày</label>
                                 <select name="size_id[]" id="size_id" multiple>
                                     @foreach($sizes as $size)
-                                    <option value="{{ $size->id }}">{{ $size->size }}</option>
+                                    <option value="{{ $size->id }}" data-size="{{ $size->size }}">{{ $size->size }}</option>
                                     @endforeach
                                 </select>
                             </div>
+
+                            <div id="stock-quantity-section"></div>
                         </div>
                     </div>
-
                 </div>
             </div>
 
@@ -272,9 +268,20 @@
             borderColor: "#92e681",
             bgColor: "#eaffe6",
         },
-        // onChange: function(values) {
-        //     console.log(values);
-        // },
+        onChange: function(values) {
+            let stockSection = $('#stock-quantity-section');
+            stockSection.empty();
+
+            values.forEach(function(sizeId) {
+                let sizeText = $('#size_id option[value="' + sizeId.value + '"]').text();
+                stockSection.append(`
+                    <div class="form-group">
+                        <label for="stock_quantity_${sizeId.value}">Số lượng tồn kho cho size ${sizeText}</label>
+                        <input type="number" name="stock_quantity[${sizeId.value}]" id="stock_quantity_${sizeId.value}" class="form-control" min="0" value="0" placeholder="Nhập số lượng tồn kho">
+                    </div>
+                `);
+            });
+        }
     });
 </script>
 

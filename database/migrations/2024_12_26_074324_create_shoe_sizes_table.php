@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('shoe_sizes', function (Blueprint $table) {
             $table->foreignId('shoe_id')->constrained('shoes')->onDelete('cascade');
             $table->foreignId('size_id')->constrained('sizes')->onDelete('cascade');
+            $table->integer('stock_quantity')->default(0);;
             $table->primary(['shoe_id', 'size_id']);
         });
     }

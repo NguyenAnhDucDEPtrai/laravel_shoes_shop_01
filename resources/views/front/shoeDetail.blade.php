@@ -40,17 +40,20 @@
                         <p>{!! $shoe->description !!}</p>
 
                         <!-- Add Size Selection (Radio Buttons) -->
-                        <div class="size-selection">
-                            <label for="size">Chọn cỡ giày:</label><br>
-                            @foreach($shoe->sizes as $size)
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="size" id="size{{ $size->id }}" value="{{ $size->id }}">
-                                <label class="form-check-label" for="size{{ $size->id }}">{{ $size->size }}</label>
+                        <form action="{{ route('cart.add', $shoe->id) }}" method="POST">
+                            @csrf
+                            <div class="size-selection">
+                                <label for="size">Chọn cỡ giày:</label><br>
+                                @foreach($shoe->sizes as $size)
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="size" id="size{{ $size->id }}" value="{{ $size->id }}">
+                                    <label class="form-check-label" for="size{{ $size->id }}">{{ $size->size }}</label>
+                                </div>
+                                @endforeach
                             </div>
-                            @endforeach
-                        </div>
 
-                        <a href="#" class="btn btn-dark mt-4"><i class="fas fa-shopping-cart"></i> &nbsp;ADD TO CART</a>
+                            <button type="submit" class="btn btn-dark mt-4"><i class="fas fa-shopping-cart"></i> &nbsp;ADD TO CART</button>
+                        </form>
                     </div>
                 </div>
 

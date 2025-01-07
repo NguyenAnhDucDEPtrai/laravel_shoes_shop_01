@@ -59,7 +59,6 @@
                             <th>Ảnh</th>
                             <th>Tên giày</th>
                             <th>Giá tiền</th>
-                            <th>Số lượng</th>
                             <th>Trạng thái</th>
                             <th>Hành động</th>
                         </tr>
@@ -78,7 +77,6 @@
                             </td>
                             <td>{{ $shoe->shoe_name }}</td>
                             <td>{{ $shoe->price }}</td>
-                            <td>{{ $shoe->quantity }}</td>
                             <td>
                                 @if($shoe->status == 'Active')
                                 <span class="badge badge-success">Hoạt động</span>

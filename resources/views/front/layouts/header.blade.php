@@ -93,13 +93,13 @@
                             <a href="{{ route('front.shopByBrand', $brand->id) }}" class="btn btn-dark dropdown-toggle">
                                 {{ $brand->brand_name }}
                             </a>
-                           
+
                         </li>
                         @endforeach
                     </ul>
                 </div>
                 <div class="right-nav py-0">
-                    <a href="#" class="ml-3 d-flex pt-2">
+                    <a href="{{ route('cart.show') }}" class="ml-3 d-flex pt-2">
                         <i class="fas fa-shopping-cart text-primary"></i>
                     </a>
                 </div>

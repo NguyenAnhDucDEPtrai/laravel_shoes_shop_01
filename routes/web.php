@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 // front
 use App\Http\Controllers\front\FrontController;
 use App\Http\Controllers\front\ShopController;
+use App\Http\Controllers\front\CartController;
 
 
 // admin
@@ -24,6 +25,11 @@ Route::get('/shopByBrand/{id}', [ShopController::class, 'shopByBrand'])->name('f
 Route::get('/filter-shoes/{id}', [ShopController::class, 'filterShoes'])->name('front.filterShoes');
 Route::get('/shoe-detail/{id}', [ShopController::class, 'shoeDetail'])->name('front.shoeDetail');
 
+//cart
+Route::get('/cart', [CartController::class, 'showCart'])->name('cart.show');
+Route::post('/cart/add/{id}', [CartController::class, 'addToCart'])->name('cart.add');
+Route::post('/cart/update/{id}', [CartController::class, 'updateCart'])->name('cart.update');
+Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
 
 
 

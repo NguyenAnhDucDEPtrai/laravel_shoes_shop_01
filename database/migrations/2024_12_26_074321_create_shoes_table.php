@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('shoe_name', 100)->unique();
             $table->decimal('price', 10, 2);
-            $table->text('description')->nullable();
-            $table->integer('quantity');
+            $table->text('description')->nullable();           
             $table->enum('status', ['Active', 'Block']);
             $table->timestamps();
         });

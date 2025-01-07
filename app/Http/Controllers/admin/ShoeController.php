@@ -119,7 +119,6 @@ class ShoeController extends Controller
         $validator = Validator::make($request->all(), [
             'shoe_name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'quantity' => 'required|integer|min:0',
             'description' => 'nullable|string',
             'status' => 'required|in:Active,Block',
             'brand_id' => 'required|exists:brands,id',
@@ -127,6 +126,8 @@ class ShoeController extends Controller
             'categories.*' => 'exists:categories,id',
             'size_id' => 'required|array|min:1',
             'size_id.*' => 'exists:sizes,id',
+            'stock_quantity' => 'required|array',
+            'stock_quantity.*' => 'integer|min:0',
         ]);
 
         if ($validator->passes()) {
@@ -135,7 +136,6 @@ class ShoeController extends Controller
             $shoe->shoe_name = $request->shoe_name;
             $shoe->price = $request->price;
             $shoe->description = $request->description;
-            $shoe->quantity = $request->quantity;
             $shoe->status = $request->status;
             $shoe->save();
 
@@ -148,10 +148,15 @@ class ShoeController extends Controller
             }
 
             $sizeIds = $request->input('size_id', []);
+            $stockQuantities = $request->input('stock_quantity', []);
+
             foreach ($sizeIds as $sizeId) {
+                $stockQuantity = $stockQuantities[$sizeId] ?? 0; // Lấy số lượng tồn kho cho size này
+
                 DB::table('shoe_sizes')->insert([
                     'shoe_id' => $shoe->id,
                     'size_id' => $sizeId,
+                    'stock_quantity' => $stockQuantity,
                 ]);
             }
 
@@ -180,7 +185,11 @@ class ShoeController extends Controller
 
         $categories = Category::where('brand_id', $brand_current->id)->get(['id', 'category_name']);
 
-        return view('admin.shoes.edit', compact('shoe', 'brands', 'categories', 'sizes', 'brand_current'));
+        $currentStock = DB::table('shoe_sizes')
+            ->where('shoe_id', $id)
+            ->pluck('stock_quantity', 'size_id');
+
+        return view('admin.shoes.edit', compact('shoe', 'brands', 'categories', 'sizes', 'brand_current', 'currentStock'));
     }
 
     public function update(Request $request, $id)
@@ -188,7 +197,6 @@ class ShoeController extends Controller
         $validator = Validator::make($request->all(), [
             'shoe_name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'quantity' => 'required|integer|min:0',
             'description' => 'nullable|string',
             'status' => 'required|in:Active,Block',
             'brand_id' => 'required|exists:brands,id',
@@ -207,7 +215,6 @@ class ShoeController extends Controller
             $shoe->shoe_name = $request->shoe_name;
             $shoe->price = $request->price;
             $shoe->description = $request->description;
-            $shoe->quantity = $request->quantity;
             $shoe->status = $request->status;
             $shoe->save();
 
@@ -222,10 +229,14 @@ class ShoeController extends Controller
 
             DB::table('shoe_sizes')->where('shoe_id', $shoe->id)->delete();
             $sizeIds = $request->input('size_id', []);
+            $stockQuantities = $request->input('stock_quantity', []);
+
             foreach ($sizeIds as $sizeId) {
+                $stockQuantity = $stockQuantities[$sizeId] ?? 0;
                 DB::table('shoe_sizes')->insert([
                     'shoe_id' => $shoe->id,
                     'size_id' => $sizeId,
+                    'stock_quantity' => $stockQuantity,
                 ]);
             }
 
