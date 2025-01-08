@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\front\FrontController;
 use App\Http\Controllers\front\ShopController;
 use App\Http\Controllers\front\CartController;
+use App\Http\Controllers\front\FrontAuthController;
 
 
 // admin
@@ -31,6 +32,13 @@ Route::post('/cart/add/{shoeId}', [CartController::class, 'addToCart'])->name('c
 Route::get('/cart/remove/{shoeId}/{sizeId}', [CartController::class, 'removeFromCart'])->name('cart.remove');
 Route::get('/cart/increase/{shoeId}/{sizeId}', [CartController::class, 'increaseQuantity'])->name('cart.increase');
 Route::get('/cart/decrease/{shoeId}/{sizeId}', [CartController::class, 'decreaseQuantity'])->name('cart.decrease');
+
+//Auth
+Route::get('/login', [FrontAuthController::class, 'showLogin'])->name('front.auth.showLogin');
+Route::post('/login', [FrontAuthController::class, 'login'])->name('front.auth.login');
+Route::get('/register', [FrontAuthController::class, 'showRegister'])->name('front.auth.showRegister');
+Route::post('/register', [FrontAuthController::class, 'register'])->name('front.auth.register');
+Route::get('/logout', [FrontAuthController::class, 'logout'])->name('front.auth.logout');
 
 
 

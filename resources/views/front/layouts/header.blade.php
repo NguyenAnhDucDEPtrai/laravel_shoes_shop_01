@@ -58,15 +58,13 @@
                     </a>
                 </div>
                 <div class="col-lg-6 col-6 text-left  d-flex justify-content-end align-items-center">
-                    <a href="#" class="nav-link text-dark">Tài khoản</a>
-                    <form action="">
-                        <div class="input-group">
-                            <input type="text" placeholder="Tìm kiếm giày" class="form-control" aria-label="Amount (to the nearest dollar)">
-                            <span class="input-group-text">
-                                <i class="fa fa-search"></i>
-                            </span>
-                        </div>
-                    </form>
+                    @if (Auth::check())
+                    <span class="mr-3">Chào, {{ Auth::user()->name }}</span>
+                    <a href="{{ route('front.auth.logout') }}" class="nav-link text-dark">Đăng xuất</a>
+                    @else
+                    <a href="{{ route('front.auth.showLogin') }}" class="nav-link text-dark">Đăng nhập</a>
+                    @endif
+
                 </div>
             </div>
         </div>
@@ -80,14 +78,11 @@
                     <span class="h2 text-uppercase text-white px-2">SHOP</span>
                 </a>
                 <button class="navbar-toggler menu-btn" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <!-- <span class="navbar-toggler-icon icon-menu"></span> -->
                     <i class="navbar-toggler-icon fas fa-bars"></i>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <!-- <li class="nav-item">
-          				<a class="nav-link active" aria-current="page" href="index.php" title="Products">Home</a>
-        			</li> -->
+
                         @foreach($brands as $brand)
                         <li class="nav-item dropdown">
                             <a href="{{ route('front.shopByBrand', $brand->id) }}" class="btn btn-dark dropdown-toggle">
