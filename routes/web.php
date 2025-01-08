@@ -6,7 +6,7 @@ use App\Http\Controllers\front\FrontController;
 use App\Http\Controllers\front\ShopController;
 use App\Http\Controllers\front\CartController;
 use App\Http\Controllers\front\FrontAuthController;
-
+use App\Http\Controllers\front\AccountController;
 
 // admin
 use App\Http\Controllers\admin\AdminLoginController;
@@ -16,9 +16,10 @@ use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\SizeController;
 use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\admin\ShoeController;
+use App\Http\Controllers\front\FrontOrderController;
 
 use App\Http\Middleware\AdminMiddleware;
-
+use App\Http\Middleware\FrontMiddleware;
 
 // Front
 Route::get('/', [FrontController::class, 'home'])->name('front.home');
@@ -39,6 +40,21 @@ Route::post('/login', [FrontAuthController::class, 'login'])->name('front.auth.l
 Route::get('/register', [FrontAuthController::class, 'showRegister'])->name('front.auth.showRegister');
 Route::post('/register', [FrontAuthController::class, 'register'])->name('front.auth.register');
 Route::get('/logout', [FrontAuthController::class, 'logout'])->name('front.auth.logout');
+
+//Đặt hàng và tài khoản
+Route::middleware([FrontMiddleware::class])->group(function () {
+    //quản lý đơn hàng
+    Route::get('/order', [FrontOrderController::class, 'showOrder'])->name('front.order.showOrder');
+    Route::post('/place-order', [FrontOrderController::class, 'placeOrder'])->name('front.order.place');
+    Route::get('/my-orders', [FrontOrderController::class, 'myOrders'])->name('front.myOrders');
+    Route::get('/order-detail/{order}', [FrontOrderController::class, 'orderDetail'])->name('front.orderDetail');
+
+    //quản lý tài khoản
+    Route::get('/profile', [AccountController::class, 'showProfile'])->name('front.showProfile');
+    Route::post('/profile/update', [AccountController::class, 'updateProfile'])->name('front.updateProfile');
+    Route::get('/changePassword', [AccountController::class, 'showChangePassword'])->name('front.showChangePassword');
+    Route::post('/change-password', [AccountController::class, 'changePassword'])->name('changePassword');
+});
 
 
 

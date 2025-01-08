@@ -29,8 +29,8 @@
             <div class="col-lg-4 col-6">
                 <div class="small-box card">
                     <div class="inner">
-                        <h3>150</h3>
-                        <p>Total Orders</p>
+                        <h3>{{ $totalOrders }}</h3>
+                        <p>Tổng số đơn đặt hàng</p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-bag"></i>
@@ -42,8 +42,8 @@
             <div class="col-lg-4 col-6">
                 <div class="small-box card">
                     <div class="inner">
-                        <h3>50</h3>
-                        <p>Total Customers</p>
+                        <h3>{{ $totalUsers }}</h3>
+                        <p>Tổng số khách hàng</p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-stats-bars"></i>
@@ -55,8 +55,8 @@
             <div class="col-lg-4 col-6">
                 <div class="small-box card">
                     <div class="inner">
-                        <h3>$1000</h3>
-                        <p>Total Sale</p>
+                        <h3>{{ number_format($totalRevenue, 0, ',', '.') }} đ</h3>
+                        <p>Tổng doanh số</p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-person-add"></i>
@@ -68,4 +68,6 @@
     </div>
     <!-- /.card -->
 </section>
+
+<script src="{{ asset('admin-assets/plugins/jquery/jquery.min.js') }}"></script>
 @endsection

@@ -87,7 +87,7 @@
                                 <div>{{ number_format($total, 0, ',', '.') }} đ</div>
                             </div>
                             <div class="pt-5">
-                                <a href="#" class="btn-dark btn btn-block w-100">Đặt hàng</a>
+                                <a href="{{ route('front.order.showOrder') }}" class="btn-dark btn btn-block w-100">Mua hàng</a>
                             </div>
                         </div>
                     </div>

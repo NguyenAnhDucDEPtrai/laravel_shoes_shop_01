@@ -93,9 +93,13 @@
                         @endforeach
                     </ul>
                 </div>
-                <div class="right-nav py-0">
-                    <a href="{{ route('cart.show') }}" class="ml-3 d-flex pt-2">
+                <div class="right-nav py-0 d-flex">
+                    <a href="{{ route('cart.show') }}" class="ml-3 d-flex pt-2" style="margin-right: 16px;">
                         <i class="fas fa-shopping-cart text-primary"></i>
+                    </a>
+
+                    <a href="{{ route('front.showProfile') }}" class="ml-3 d-flex pt-2">
+                        <i class="fas fa-user text-white"></i>
                     </a>
                 </div>
             </nav>

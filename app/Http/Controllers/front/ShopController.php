@@ -59,9 +59,15 @@ class ShopController extends Controller
     {
         //header
         $brands = Brand::with('categories')->get();
-        
+
         //shop
         $shoe = Shoe::with('images', 'sizes')->find($id);
-        return view('front.shoeDetail', compact('brands', 'shoe'));
+        $relatedShoes = Shoe::whereHas('categories', function ($query) use ($shoe) {
+            $query->where('category_id', $shoe->categories->first()->id);
+        })
+            ->where('id', '!=', $shoe->id) // Loại trừ giày hiện tại
+            ->take(4) // Lấy 4 sản phẩm
+            ->get();
+        return view('front.shoeDetail', compact('brands', 'shoe', 'relatedShoes'));
     }
 }
