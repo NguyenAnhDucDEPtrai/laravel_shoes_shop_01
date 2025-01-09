@@ -119,8 +119,12 @@
                                 <label for="brand_id">Thương hiệu</label>
                                 <select name="brand_id" id="brand_id" class="form-control">
                                     @foreach($brands as $brand)
-                                    <option value="{{ $brand->id }}" {{  $brand_current->id == $brand->id ? 'selected' : '' }}>{{ $brand->brand_name }}</option>
-                                    @endforeach
+                                    <option value="{{ $brand->id }}"
+                                        @if($brand_current && $brand_current->id == $brand->id)
+                                        selected
+                                        @endif>
+                                        {{ $brand->brand_name }}
+                                    </option> @endforeach
                                 </select>
                             </div>
                             <div class="mb-3">

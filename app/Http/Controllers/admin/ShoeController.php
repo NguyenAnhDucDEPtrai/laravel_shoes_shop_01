@@ -183,7 +183,11 @@ class ShoeController extends Controller
             $brand_current = $firstCategory_current->brand;
         }
 
-        $categories = Category::where('brand_id', $brand_current->id)->get(['id', 'category_name']);
+        if ($brand_current && $brand_current->id != null) {
+            $categories = Category::where('brand_id', $brand_current->id)->get(['id', 'category_name']);
+        } else {
+            $categories = []; // Trường hợp không có brand
+        }
 
         $currentStock = DB::table('shoe_sizes')
             ->where('shoe_id', $id)
